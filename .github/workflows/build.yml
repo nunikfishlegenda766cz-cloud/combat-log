@@ -17,7 +17,7 @@ jobs:
           java-version: '17'
 
       - name: Build pomocí Mavenu
-        run: mvn clean package
+        run: mvn package
 
       - name: Nahrání artefaktu (.jar)
         uses: actions/upload-artifact@v4
