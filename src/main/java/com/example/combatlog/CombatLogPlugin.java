@@ -2,9 +2,6 @@ package com.example.combatlog;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public final class CombatLogPlugin extends JavaPlugin implements Listener, CommandExecutor {
+public final class CombatLogPlugin extends JavaPlugin implements Listener {
 
     private final Map<UUID, Long> combatTagTime = new HashMap<>();
     private final int COMBAT_DURATION_SECONDS = 20;
@@ -27,7 +24,6 @@ public final class CombatLogPlugin extends JavaPlugin implements Listener, Comma
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
-        getCommand("combat").setExecutor(this);
         getLogger().info("CombatLogPlugin byl úspěšně spuštěn!");
     }
 
@@ -98,24 +94,9 @@ public final class CombatLogPlugin extends JavaPlugin implements Listener, Comma
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         if (isInCombat(player)) {
-            player.setHealth(0.0); // Zabije ho to na místě, věci vypadnou na zem a hra napíše úmrtní hlášku
+            player.setHealth(0.0);
             Bukkit.broadcastMessage(ChatColor.RED + "⚡ Hráč " + player.getName() + " se odpojil v boji a zemřel!");
         }
         combatTagTime.remove(player.getUniqueId());
-    }
-
-    // Příkaz /combat pro zjištění stavu
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) return true;
-        Player player = (Player) sender;
-
-        if (isInCombat(player)) {
-            long remaining = (combatTagTime.get(player.getUniqueId()) - System.currentTimeMillis()) / 1000;
-            player.sendMessage(ChatColor.YELLOW + "⚠ Jsi v combatu ještě " + remaining + " sekund!");
-        } else {
-            player.sendMessage(ChatColor.GREEN + "✔ Nejsi v combatu, můžeš bezpečně teleportovat.");
-        }
-        return true;
     }
 }
